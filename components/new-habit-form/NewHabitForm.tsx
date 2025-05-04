@@ -39,12 +39,15 @@ const formSchema = z.object({
 export function NewHabitForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: "onChange",
     defaultValues: {
       name: "",
       description: "",
       goal: undefined,
     },
   });
+
+  const { isValid } = form.formState;
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
@@ -56,17 +59,17 @@ export function NewHabitForm() {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col sm:flex-row items-stretch sm:items-start gap-4"
+          className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto_auto] items-start gap-4"
         >
           <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
-              <FormItem className="flex-grow w-full sm:w-auto">
+              <FormItem>
                 <FormControl>
                   <Input placeholder="Habit name" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="min-h-[1.25rem] w-full" />
               </FormItem>
             )}
           />
@@ -74,11 +77,11 @@ export function NewHabitForm() {
             control={form.control}
             name="description"
             render={({ field }) => (
-              <FormItem className="flex-grow w-full sm:w-auto">
+              <FormItem>
                 <FormControl>
                   <Input placeholder="Habit description" {...field} />
                 </FormControl>
-                <FormMessage />
+                <FormMessage className="min-h-[1.25rem] w-full" />
               </FormItem>
             )}
           />
@@ -86,7 +89,7 @@ export function NewHabitForm() {
             control={form.control}
             name="goal"
             render={({ field }) => (
-              <FormItem className="flex-grow-0 flex-shrink w-full sm:w-auto">
+              <FormItem>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
@@ -103,13 +106,14 @@ export function NewHabitForm() {
                     <SelectItem value="30">30 Days</SelectItem>
                   </SelectContent>
                 </Select>
-                <FormMessage /> {/* Error message will appear here */}
+                <FormMessage className="min-h-[1.25rem] w-full" />
               </FormItem>
             )}
           />
           <Button
             type="submit"
-            className="flex-shrink-0 whitespace-nowrap bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-fuchsia-500 hover:to-purple-500 text-white px-6 w-full sm:w-auto transition-colors duration-300 ease-in"
+            disabled={!isValid}
+            className="whitespace-nowrap bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-fuchsia-500 hover:to-purple-500 text-white px-6 w-full sm:w-auto transition-colors duration-300 ease-in"
           >
             Add habit
           </Button>
