@@ -12,11 +12,28 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const goalValues = ["7", "14", "30"] as const;
 
 const formSchema = z.object({
-  name: z.string().min(2).max(50),
-  description: z.string().min(2).max(50),
-  goal: z.string().min(2).max(50),
+  name: z
+    .string()
+    .min(2, { message: "Name must be at least 2 characters." })
+    .max(50),
+  description: z
+    .string()
+    .min(2, { message: "Description must be at least 2 characters." })
+    .max(150),
+  goal: z.enum(goalValues, {
+    errorMap: () => ({ message: "Please select a valid goal duration." }),
+  }),
 });
 
 export function NewHabitForm() {
@@ -25,7 +42,7 @@ export function NewHabitForm() {
     defaultValues: {
       name: "",
       description: "",
-      goal: "",
+      goal: undefined,
     },
   });
 
@@ -34,7 +51,7 @@ export function NewHabitForm() {
     form.reset();
   }
   return (
-    <div className="max-w-5xl mx-auto mt-8 p-6 sm:p-8 bg-white dark:bg-zinc-900 rounded-xl shadow-md border border-gray-200 dark:border-gray-700">
+    <div className="max-w-5xl mx-auto mt-8 p-6 sm:p-8 bg-white dark:bg-neutral-900 rounded-xl shadow-md border border-gray-200 dark:border-neutral-700">
       <h1 className="mb-6 text-xl font-semibold">Create a new habit</h1>
       <Form {...form}>
         <form
@@ -69,17 +86,30 @@ export function NewHabitForm() {
             control={form.control}
             name="goal"
             render={({ field }) => (
-              <FormItem className="flex-grow-0 flex-shrink sm:w-1/5 w-full">
-                <FormControl>
-                  <Input placeholder="Goal" {...field} />
-                </FormControl>
-                <FormMessage />
+              <FormItem className="flex-grow-0 flex-shrink w-full sm:w-auto">
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  value={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Select goal..." />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="7">7 Days</SelectItem>
+                    <SelectItem value="14">14 Days</SelectItem>
+                    <SelectItem value="30">30 Days</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage /> {/* Error message will appear here */}
               </FormItem>
             )}
           />
           <Button
             type="submit"
-            className="flex-shrink-0 whitespace-nowrap bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-6  w-full sm:w-auto"
+            className="flex-shrink-0 whitespace-nowrap bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-fuchsia-500 hover:to-purple-500 text-white px-6 w-full sm:w-auto transition-colors duration-300 ease-in"
           >
             Add habit
           </Button>
