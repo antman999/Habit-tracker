@@ -1,12 +1,5 @@
+import { AuthControls } from "./authControls";
 import { ThemeToggle } from "./themeToggle";
-import { Button } from "@/components/ui/button";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  SignUpButton,
-  UserButton,
-} from "@clerk/nextjs";
 
 export function NavBar() {
   return (
@@ -14,23 +7,9 @@ export function NavBar() {
       <div className="text-lg font-semibold text-gray-800 dark:text-gray-200">
         Habit Tracker
       </div>
-      <div className="flex gap-4  items-center">
+      <div className="flex gap-4 items-center">
         <ThemeToggle />
-        <SignedIn>
-          <UserButton />
-        </SignedIn>
-        <SignedOut>
-          <SignInButton mode="modal">
-            <Button variant="outline" size="sm">
-              Sign In
-            </Button>
-          </SignInButton>
-          <SignUpButton mode="modal">
-            <Button variant="default" size="sm">
-              Sign Up
-            </Button>
-          </SignUpButton>
-        </SignedOut>
+        <AuthControls />
       </div>
     </nav>
   );
