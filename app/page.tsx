@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <div className="flex flex-col text-center px-4 pt-12">
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
-        Habit Tracker
+        Habit Achiever
       </h1>
       <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-6">
         Track your habits, build consistency, achieve your goals.

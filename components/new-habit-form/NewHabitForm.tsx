@@ -2,7 +2,9 @@
 
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -20,6 +22,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
+interface NewHabitFormProps {
+  onHabitCreated: () => void;
+}
+
 const goalValues = ["7", "14", "30"] as const;
 
 const formSchema = z.object({
@@ -36,7 +42,7 @@ const formSchema = z.object({
   }),
 });
 
-export function NewHabitForm() {
+export function NewHabitForm({ onHabitCreated }: NewHabitFormProps) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: "onChange",
@@ -46,12 +52,50 @@ export function NewHabitForm() {
       goal: undefined,
     },
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { isValid } = form.formState;
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    setSubmitError(null);
+    try {
+      const response = await fetch("/api/habits", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      const responseBody = await response.json();
+
+      if (!response.ok) {
+        const errorMsg =
+          responseBody.error ||
+          JSON.stringify(responseBody.details) ||
+          `HTTP error! status: ${response.status}`;
+        throw new Error(errorMsg);
+      }
+
+      const newHabit = responseBody;
+      console.log("Habit created:", newHabit);
+
+      toast.success(`Habit "${newHabit.name}" created successfully!`);
+      onHabitCreated();
+      form.reset();
+    } catch (error) {
+      console.error("Failed to submit habit:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred.";
+      setSubmitError(errorMessage);
+      toast.error(`Failed to create habit: ${errorMessage}`);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
   return (
     <div className="max-w-5xl mx-auto mt-8 p-6 sm:p-8 bg-white dark:bg-neutral-900 rounded-xl shadow-md border border-gray-200 dark:border-neutral-700">
@@ -112,12 +156,13 @@ export function NewHabitForm() {
           />
           <Button
             type="submit"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
             className="whitespace-nowrap bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-fuchsia-500 hover:to-purple-500 text-white px-6 w-full sm:w-auto transition-colors duration-300 ease-in"
           >
-            Add habit
+            {isSubmitting ? "Adding..." : "Add habit"}
           </Button>
         </form>
+        {submitError && <p className="text-red-500 mt-2">{submitError}</p>}
       </Form>
     </div>
   );

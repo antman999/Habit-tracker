@@ -17,7 +17,11 @@ export function AuthControls() {
       </SignedIn>
       <SignedOut>
         <SignInButton mode="modal" appearance={currentTheme}>
-          <Button variant="default" size="sm">
+          <Button
+            variant="default"
+            size="sm"
+            className="whitespace-nowrap bg-gradient-to-r from-purple-500 to-fuchsia-500 hover:from-fuchsia-500 hover:to-purple-500 text-white px-6 w-auto transition-colors duration-300 ease-in"
+          >
             Sign In
           </Button>
         </SignInButton>
