@@ -1,20 +1,14 @@
-import { Button } from "@/components/ui/button";
 import { CheckIcon, SparklesIcon } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen text-center px-4 pt-20 pb-12">
+    <div className="flex flex-col text-center px-4 pt-12">
       <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold mb-4 bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
         Habit Tracker
       </h1>
       <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-400 mb-6">
         Track your habits, build consistency, achieve your goals.
       </p>
-      <div className="mb-6">
-        <Button className="w-64 bg-gradient-to-r text-lg from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700  text-white font-semibold px-8 py-3 rounded-lg shadow-md transition-all duration-300 ease-in-out hover:shadow-lg transform hover:-translate-y-1 ">
-          Get Started
-        </Button>
-      </div>
 
       <div className="text-left max-w-lg mx-auto">
         <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">

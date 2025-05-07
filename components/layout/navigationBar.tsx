@@ -1,5 +1,12 @@
 import { ThemeToggle } from "./themeToggle";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 
 export function NavBar() {
   return (
@@ -9,10 +16,21 @@ export function NavBar() {
       </div>
       <div className="flex gap-4  items-center">
         <ThemeToggle />
-        <Avatar>
-          <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-          <AvatarFallback>CN</AvatarFallback>
-        </Avatar>
+        <SignedIn>
+          <UserButton />
+        </SignedIn>
+        <SignedOut>
+          <SignInButton mode="modal">
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+          </SignInButton>
+          <SignUpButton mode="modal">
+            <Button variant="default" size="sm">
+              Sign Up
+            </Button>
+          </SignUpButton>
+        </SignedOut>
       </div>
     </nav>
   );
