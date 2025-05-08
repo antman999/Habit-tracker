@@ -1,3 +1,8 @@
+interface WeekDate {
+  display: string;
+  iso: string;
+}
+
 function getDateSuffix(day: number): string {
   if (day >= 11 && day <= 13) {
     return "th";
@@ -15,7 +20,14 @@ function getDateSuffix(day: number): string {
   }
 }
 
-export function getCurrentWeekDatesFormatted(): string[] {
+function formatIsoDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function getCurrentWeekDatesFormatted(): WeekDate[] {
   const today = new Date();
   const currentDayOfWeek = today.getDay();
 
@@ -23,7 +35,7 @@ export function getCurrentWeekDatesFormatted(): string[] {
   startOfWeek.setDate(today.getDate() - currentDayOfWeek);
   startOfWeek.setHours(0, 0, 0, 0);
 
-  const weekDatesFormatted: string[] = [];
+  const weekDates: WeekDate[] = [];
 
   for (let i = 0; i < 7; i++) {
     const currentDayDate = new Date(startOfWeek);
@@ -31,18 +43,16 @@ export function getCurrentWeekDatesFormatted(): string[] {
 
     const dayNumber = currentDayDate.getDate();
     const suffix = getDateSuffix(dayNumber);
-
     const dayName = currentDayDate.toLocaleDateString("en-US", {
       weekday: "narrow",
     });
-
     const monthName = currentDayDate.toLocaleDateString("en-US", {
       month: "short",
     });
-
-    const formattedDate = `${dayName}, ${monthName} ${dayNumber}${suffix}`;
-    weekDatesFormatted.push(formattedDate);
+    const formattedDisplay = `${dayName}, ${monthName} ${dayNumber}${suffix}`;
+    const formattedIso = formatIsoDate(currentDayDate);
+    weekDates.push({ display: formattedDisplay, iso: formattedIso });
   }
 
-  return weekDatesFormatted;
+  return weekDates;
 }
