@@ -6,6 +6,7 @@ import { db } from "@/lib/db";
 import { Habit, NewHabit, Completion } from "@/lib/schema";
 import { eq, count, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 export type CreateHabitState = {
   errors?: {
@@ -16,6 +17,18 @@ export type CreateHabitState = {
   };
   message?: string | null;
 };
+
+export type DeleteHabitState = {
+  success?: boolean;
+  error?: string;
+};
+
+const DeleteHabitSchema = z.object({
+  habitId: z.coerce
+    .number()
+    .int()
+    .positive("Habit ID must be a positive number."),
+});
 
 const goalValues = ["7", "14", "30"] as const;
 
@@ -131,4 +144,50 @@ export async function toggleCompletionAction(
     console.error("Error toggling completion:", error);
     return { error: "Database error occurred." };
   }
+}
+
+export async function deleteHabitAction(
+  prevState: DeleteHabitState,
+  formData: FormData
+): Promise<DeleteHabitState> {
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: "Unauthorized: Please sign in." };
+  }
+
+  const validatedFields = DeleteHabitSchema.safeParse({
+    habitId: formData.get("habitId"),
+  });
+
+  if (!validatedFields.success) {
+    return {
+      error:
+        "Invalid input: " +
+        validatedFields.error.flatten().fieldErrors.habitId?.join(", "),
+    };
+  }
+
+  const { habitId } = validatedFields.data;
+
+  try {
+    const habitToDelete = await db.query.Habit.findFirst({
+      where: and(eq(Habit.id, habitId), eq(Habit.userId, userId)),
+      columns: { id: true },
+    });
+
+    if (!habitToDelete) {
+      return {
+        error: "Habit not found or you do not have permission to delete it.",
+      };
+    }
+    await db
+      .delete(Habit)
+      .where(and(eq(Habit.id, habitId), eq(Habit.userId, userId)));
+  } catch (dbError) {
+    console.error("Database Error deleting habit:", dbError);
+    return { error: "Database error: Failed to delete habit." };
+  }
+  revalidatePath("/habits");
+  revalidatePath(`/habits/${habitId}`);
+  redirect("/habits");
 }

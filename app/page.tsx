@@ -12,7 +12,7 @@ export default function Home() {
 
       <div className="text-left max-w-lg mx-auto">
         <h2 className="text-2xl font-semibold mb-6 bg-gradient-to-r from-purple-500 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent">
-          Key Features:
+          Features:
         </h2>
         <ul className="space-y-4 text-gray-700 dark:text-gray-300">
           <li className="flex items-center  gap-3 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg shadow-sm">
@@ -23,6 +23,16 @@ export default function Home() {
             <span>
               <span className="font-semibold">Daily Tracking:</span> Easily mark
               habits as complete or incomplete each day.
+            </span>
+          </li>
+          <li className="flex items-center  gap-3 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg shadow-sm">
+            <CheckIcon
+              aria-hidden="true"
+              className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-1"
+            />
+            <span>
+              <span className="font-semibold">100% Free:</span> No Ads, No
+              Tracking, No selling your data, and open source.
             </span>
           </li>
           <li className="flex items-center  gap-3 p-3 bg-gray-50 dark:bg-neutral-800 rounded-lg shadow-sm">
@@ -42,7 +52,7 @@ export default function Home() {
             />
             <span>
               <span className="font-semibold">Customizable Habits:</span> Define
-              habit names, descriptions, goals, and frequencies.
+              habit names, descriptions, and goals.
             </span>
           </li>
           <li className="flex items-center gap-3 p-3 bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-purple-900/50 dark:to-fuchsia-900/50 rounded-lg shadow-sm border border-purple-200 dark:border-purple-700">
@@ -51,8 +61,9 @@ export default function Home() {
               className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-1"
             />
             <span>
-              <span className="font-semibold">Reminders (Coming Soon):</span>{" "}
-              Set optional notifications to stay on track.
+              <span className="font-semibold">New Features (Coming Soon):</span>{" "}
+              Reminders, stats, daily journal notes, and tools to help you get
+              there.
             </span>
           </li>
           <li className="flex items-center gap-3 p-3 bg-gradient-to-r from-purple-100 to-fuchsia-100 dark:from-purple-900/50 dark:to-fuchsia-900/50 rounded-lg shadow-sm border border-purple-200 dark:border-purple-700">
