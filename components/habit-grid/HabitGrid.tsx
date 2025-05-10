@@ -168,18 +168,16 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
             ))}
         </div>
         <div className="block sm:hidden">
-          <div className="py-4 border-b flex flex-col gap-2 border-gray-200 dark:border-neutral-800 last:border-b-0">
-            {habits.length > 0 &&
-              habits.map((habit) => (
-                <MobileHabitItem
-                  key={`mobile-habit-${habit.id}`}
-                  habit={habit}
-                  datesOfWeek={datesOfWeek}
-                  isPending={isPending}
-                  onToggleCompletion={handleCompletionToggle}
-                />
-              ))}
-          </div>
+          {habits.length > 0 &&
+            habits.map((habit) => (
+              <MobileHabitItem
+                key={`mobile-habit-${habit.id}`}
+                habit={habit}
+                datesOfWeek={datesOfWeek}
+                isPending={isPending}
+                onToggleCompletion={handleCompletionToggle}
+              />
+            ))}
         </div>
         {habits.length === 0 && (
           <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
