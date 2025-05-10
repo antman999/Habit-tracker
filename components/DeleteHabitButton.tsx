@@ -20,7 +20,7 @@ import { deleteHabitAction, DeleteHabitState } from "@/lib/actions";
 import { Trash2 } from "lucide-react";
 
 interface DeleteHabitButtonProps {
-  habitId: number;
+  habitId: string;
   habitName: string;
   className?: string;
 }

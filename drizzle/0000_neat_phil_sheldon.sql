@@ -1,12 +1,12 @@
 CREATE TABLE "completions" (
 	"id" serial PRIMARY KEY NOT NULL,
-	"habit_id" serial NOT NULL,
+	"habit_id" uuid NOT NULL,
 	"date" date NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "habits" (
-	"id" serial PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"user_id" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text,
@@ -14,6 +14,7 @@ CREATE TABLE "habits" (
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "completions" ADD CONSTRAINT "completions_habit_id_habits_id_fk" FOREIGN KEY ("habit_id") REFERENCES "public"."habits"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "completions" ADD CONSTRAINT "completions_habit_id_fk" FOREIGN KEY ("habit_id") REFERENCES "public"."habits"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "completions_habit_id_date_unq" ON "completions" USING btree ("habit_id","date");--> statement-breakpoint
 CREATE INDEX "completions_habit_id_idx" ON "completions" USING btree ("habit_id");--> statement-breakpoint

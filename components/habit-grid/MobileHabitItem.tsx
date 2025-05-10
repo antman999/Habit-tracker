@@ -17,7 +17,7 @@ interface WeekDate {
 }
 
 interface HabitWithCompletions {
-  id: number;
+  id: string;
   name: string;
   completions: string[];
 }
@@ -27,7 +27,7 @@ interface MobileHabitItemProps {
   datesOfWeek: WeekDate[];
   isPending: boolean;
   onToggleCompletion: (
-    habitId: number,
+    habitId: string,
     date: string,
     currentCheckedStatus: boolean
   ) => void;

@@ -15,7 +15,7 @@ import {
 import { MobileHabitItem } from "./MobileHabitItem";
 
 interface HabitWithCompletions {
-  id: number;
+  id: string;
   userId: string;
   name: string;
   description: string | null;
@@ -48,7 +48,7 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
   const datesOfWeek = useMemo(() => getCurrentWeekDatesFormatted(), []);
 
   const handleCompletionToggle = (
-    habitId: number,
+    habitId: string,
     date: string,
     currentCheckedStatus: boolean
   ) => {

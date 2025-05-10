@@ -2,13 +2,16 @@ import React, { Suspense } from "react";
 import { NewHabitForm } from "@/components/new-habit-form/NewHabitForm";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/db";
-import { Habit, Completion } from "@/lib/schema";
+import {
+  Habit as HabitTable,
+  Completion as CompletionTable,
+} from "@/lib/schema";
 import { eq, inArray, asc } from "drizzle-orm";
 import { HabitGridSkeleton } from "@/components/habit-grid/HabitGridSkeleton";
 import { HabitGrid } from "@/components/habit-grid/HabitGrid";
 
 interface HabitWithCompletions {
-  id: number;
+  id: string;
   userId: string;
   name: string;
   description: string | null;
@@ -17,38 +20,57 @@ interface HabitWithCompletions {
   completions: string[];
 }
 
+type DrizzleHabit = typeof HabitTable.$inferSelect;
+type DrizzleCompletionSelection = { habitId: string; date: string | null };
+
 async function fetchHabitsDataForUser(): Promise<HabitWithCompletions[]> {
   const { userId } = await auth();
   if (!userId) {
     throw new Error("Unauthorized: User must be signed in to view habits.");
   }
 
-  const userHabits = await db
+  const userHabits: DrizzleHabit[] = await db
     .select()
-    .from(Habit)
-    .where(eq(Habit.userId, userId))
-    .orderBy(asc(Habit.createdAt));
+    .from(HabitTable)
+    .where(eq(HabitTable.userId, userId))
+    .orderBy(asc(HabitTable.createdAt));
 
-  let completionsMap: Record<number, string[]> = {};
+  let completionsMap: Record<string, string[]> = {};
   if (userHabits.length > 0) {
-    const habitIds = userHabits.map((h) => h.id);
-    const relevantCompletions = await db
-      .select({ habitId: Completion.habitId, date: Completion.date })
-      .from(Completion)
-      .where(inArray(Completion.habitId, habitIds));
+    const habitIds: string[] = userHabits.map((h) => h.id);
+    const relevantCompletions: DrizzleCompletionSelection[] = await db
+      .select({ habitId: CompletionTable.habitId, date: CompletionTable.date })
+      .from(CompletionTable)
+      .where(inArray(CompletionTable.habitId, habitIds));
 
-    completionsMap = relevantCompletions.reduce((acc, comp) => {
-      if (!acc[comp.habitId]) acc[comp.habitId] = [];
-      if (typeof comp.date === "string") acc[comp.habitId].push(comp.date);
-      return acc;
-    }, {} as Record<number, string[]>);
+    completionsMap = relevantCompletions.reduce(
+      (acc: Record<string, string[]>, comp: DrizzleCompletionSelection) => {
+        const key: string = comp.habitId;
+        if (!acc[key]) {
+          acc[key] = [];
+        }
+        if (typeof comp.date === "string") {
+          acc[key].push(comp.date);
+        }
+        return acc;
+      },
+      {} as Record<string, string[]>
+    );
   }
 
-  const habitsWithCompletions = userHabits.map((habit) => ({
-    ...habit,
-    createdAt: new Date(habit.createdAt),
-    completions: completionsMap[habit.id] || [],
-  }));
+  const habitsWithCompletions: HabitWithCompletions[] = userHabits.map(
+    (habit: DrizzleHabit): HabitWithCompletions => {
+      const key: string = habit.id;
+      return {
+        ...habit,
+        id: habit.id,
+        createdAt: habit.createdAt,
+        description: habit.description ?? null,
+        goal: habit.goal ?? null,
+        completions: completionsMap[key] || [],
+      };
+    }
+  );
 
   return habitsWithCompletions;
 }

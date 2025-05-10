@@ -24,10 +24,7 @@ export type DeleteHabitState = {
 };
 
 const DeleteHabitSchema = z.object({
-  habitId: z.coerce
-    .number()
-    .int()
-    .positive("Habit ID must be a positive number."),
+  habitId: z.string().uuid({ message: "Invalid Habit ID format." }),
 });
 
 const goalValues = ["7", "14", "30"] as const;
@@ -107,7 +104,7 @@ export async function createHabitAction(
 }
 
 export async function toggleCompletionAction(
-  habitId: number,
+  habitId: string,
   date: string,
   completed: boolean
 ): Promise<{ success?: boolean; error?: string }> {
@@ -139,6 +136,7 @@ export async function toggleCompletionAction(
     }
 
     revalidatePath("/habits");
+    revalidatePath(`/habits/${habitId}`);
     return { success: true };
   } catch (error) {
     console.error("Error toggling completion:", error);

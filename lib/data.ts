@@ -56,11 +56,15 @@ export interface HabitWithDetailsAndCompletions extends Habit {
 }
 
 export async function fetchHabitDetails(
-  id: number
+  id: string
 ): Promise<HabitWithDetailsAndCompletions | null> {
   const { userId } = await auth();
   if (!userId) return null;
-  if (isNaN(id)) return null;
+
+  if (!id || typeof id !== "string") {
+    console.error("Invalid habit ID (UUID string expected):", id);
+    return null;
+  }
 
   try {
     const habit = await db.query.Habit.findFirst({

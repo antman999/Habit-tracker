@@ -16,11 +16,9 @@ export async function generateMetadata({
 }: AsyncPageProps): Promise<Metadata> {
   const routeParams = await params;
 
-  const id = parseInt(routeParams.id, 10);
+  const id: string = routeParams.id;
 
-  if (isNaN(id)) {
-    return { title: "Invalid Habit ID" };
-  }
+  if (!id) return { title: "Invalid Habit ID" };
 
   const habit = await fetchHabitDetails(id);
 
@@ -31,8 +29,8 @@ export async function generateMetadata({
 
 export default async function Page({ params }: AsyncPageProps) {
   const routeParams = await params;
-  const id = parseInt(routeParams.id, 10);
-  if (isNaN(id)) {
+  const id: string = routeParams.id;
+  if (!id) {
     notFound();
   }
 

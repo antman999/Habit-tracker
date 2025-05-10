@@ -1,5 +1,6 @@
 import {
   pgTable,
+  uuid,
   serial,
   text,
   timestamp,
@@ -8,11 +9,14 @@ import {
   index,
   foreignKey,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const Habit = pgTable(
   "habits",
   {
-    id: serial("id").primaryKey(),
+    id: uuid("id")
+      .default(sql`gen_random_uuid()`)
+      .primaryKey(),
     userId: text("user_id").notNull(),
     name: text("name").notNull(),
     description: text("description"),
@@ -28,7 +32,9 @@ export const Completion = pgTable(
   "completions",
   {
     id: serial("id").primaryKey(),
-    habitId: serial("habit_id").notNull(),
+    habitId: uuid("habit_id")
+      .notNull()
+      .references(() => Habit.id, { onDelete: "cascade" }),
     date: date("date", { mode: "string" }).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
