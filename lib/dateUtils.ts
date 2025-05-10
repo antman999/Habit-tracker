@@ -2,6 +2,8 @@ import { parseISO, differenceInDays } from "date-fns";
 interface WeekDate {
   display: string;
   iso: string;
+  dayInitial: string;
+  dayNumber: string;
 }
 
 interface DateGroup {
@@ -38,7 +40,6 @@ function formatIsoDate(date: Date): string {
 export function getCurrentWeekDatesFormatted(): WeekDate[] {
   const today = new Date();
   const currentDayOfWeek = today.getDay();
-
   const startOfWeek = new Date(today);
   startOfWeek.setDate(today.getDate() - currentDayOfWeek);
   startOfWeek.setHours(0, 0, 0, 0);
@@ -51,17 +52,27 @@ export function getCurrentWeekDatesFormatted(): WeekDate[] {
 
     const dayNumber = currentDayDate.getDate();
     const suffix = getDateSuffix(dayNumber);
-    const dayName = currentDayDate.toLocaleDateString("en-US", {
-      weekday: "narrow",
+    const dayNameShort = currentDayDate.toLocaleDateString("en-US", {
+      weekday: "short",
     });
     const monthName = currentDayDate.toLocaleDateString("en-US", {
       month: "short",
     });
-    const formattedDisplay = `${dayName}, ${monthName} ${dayNumber}${suffix}`;
-    const formattedIso = formatIsoDate(currentDayDate);
-    weekDates.push({ display: formattedDisplay, iso: formattedIso });
-  }
 
+    const formattedDisplay = `${dayNameShort}, ${monthName} ${dayNumber}${suffix}`;
+    const formattedIso = formatIsoDate(currentDayDate);
+    const dayInitial = currentDayDate.toLocaleDateString("en-US", {
+      weekday: "narrow",
+    });
+    const dayNumberStr = dayNumber.toString();
+
+    weekDates.push({
+      display: formattedDisplay,
+      iso: formattedIso,
+      dayInitial: dayInitial,
+      dayNumber: dayNumberStr,
+    });
+  }
   return weekDates;
 }
 

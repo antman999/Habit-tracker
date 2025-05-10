@@ -12,6 +12,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { MobileHabitItem } from "./MobileHabitItem";
 
 interface HabitWithCompletions {
   id: number;
@@ -26,6 +27,15 @@ interface HabitWithCompletions {
 interface HabitGridProps {
   initialHabits: HabitWithCompletions[];
 }
+
+const successMessages = [
+  "Yes! Another day conquered. Keep it up! 💪",
+  "Small steps, big results. Well done today! 🌄",
+  "Progress! You're making it happen. 🥳",
+  "Each completion is a victory. Celebrate this one! 🏆",
+  "Remember why you started. Proud of your dedication! 💖",
+  "Awesome job! One step closer to making a habit part of your daily life 🎉",
+];
 
 export function HabitGrid({ initialHabits }: HabitGridProps) {
   const [habits, setHabits] = useState(initialHabits);
@@ -43,6 +53,8 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
     currentCheckedStatus: boolean
   ) => {
     const newCompletedStatus = !currentCheckedStatus;
+    const randomMessage =
+      successMessages[Math.floor(Math.random() * successMessages.length)];
     setHabits((currentHabits) =>
       currentHabits.map((habit) => {
         if (habit.id === habitId) {
@@ -69,7 +81,7 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
 
           setHabits(initialHabits);
         } else {
-          toast.success("Habit updated");
+          toast.success(randomMessage);
         }
       } catch (err) {
         toast.error("An unexpected error occurred.");
@@ -81,14 +93,14 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
 
   return (
     <TooltipProvider>
-      <div className="max-w-5xl mx-auto mt-8 p-6 sm:p-8 bg-white dark:bg-neutral-900 rounded-xl shadow-md border border-gray-200 dark:border-neutral-700">
-        <div className="grid grid-cols-[auto_repeat(7,minmax(0,1fr))_auto] gap-x-2 sm:gap-x-3 gap-y-6 items-center text-center">
+      <div className="max-w-5xl mx-auto mt-8 p-4 sm:p-6 md:p-8 bg-white dark:bg-neutral-900 rounded-xl shadow-md border border-gray-200 dark:border-neutral-700">
+        <div className="hidden sm:grid grid-cols-[auto_repeat(7,minmax(0,1fr))_auto] gap-x-2 sm:gap-x-3 gap-y-6 items-center text-center">
           <div className="font-semibold text-left sticky top-0 bg-white dark:bg-neutral-900 py-2 pl-4 pr-2">
             Habit
           </div>
           {datesOfWeek.map((day) => (
             <div
-              key={day.iso}
+              key={`desktop-header-${day.iso}`}
               className="font-semibold text-xs sm:text-sm sticky top-0 bg-white dark:bg-neutral-900 py-2"
             >
               {day.display}
@@ -97,7 +109,7 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
           <div className="sticky top-0 py-2 pr-4"></div>
           {habits.length > 0 &&
             habits.map((habit) => (
-              <React.Fragment key={habit.id}>
+              <React.Fragment key={`desktop-habit-${habit.id}`}>
                 <div className="text-left py-2 pl-4 pr-2 font-medium overflow-hidden max-w-20 sm:max-w-24 md:max-w-32">
                   <Tooltip delayDuration={300}>
                     <TooltipTrigger asChild>
@@ -108,7 +120,7 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
                         {habit.name}
                       </Link>
                     </TooltipTrigger>
-                    <TooltipContent>
+                    <TooltipContent side="bottom" align="start">
                       <p>{habit.name}</p>
                     </TooltipContent>
                   </Tooltip>
@@ -118,7 +130,7 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
 
                   return (
                     <div
-                      key={`${habit.id}-${day.iso}`}
+                      key={`desktop-checkbox-${habit.id}-${day.iso}`}
                       className="flex justify-center items-center py-2"
                     >
                       <input
@@ -154,6 +166,20 @@ export function HabitGrid({ initialHabits }: HabitGridProps) {
                 </div>
               </React.Fragment>
             ))}
+        </div>
+        <div className="block sm:hidden">
+          <div className="py-4 border-b flex flex-col gap-2 border-gray-200 dark:border-neutral-800 last:border-b-0">
+            {habits.length > 0 &&
+              habits.map((habit) => (
+                <MobileHabitItem
+                  key={`mobile-habit-${habit.id}`}
+                  habit={habit}
+                  datesOfWeek={datesOfWeek}
+                  isPending={isPending}
+                  onToggleCompletion={handleCompletionToggle}
+                />
+              ))}
+          </div>
         </div>
         {habits.length === 0 && (
           <p className="text-center text-gray-500 dark:text-gray-400 mt-4">
