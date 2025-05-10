@@ -57,11 +57,10 @@ export function DeleteHabitButton({
       <AlertDialogTrigger asChild>
         <Button
           variant="destructive"
-          size="sm"
-          className={cn("flex items-center gap-1.5", className)}
+          size="icon"
+          className={cn(" rounded-lg cursor-pointer", className)}
         >
           <Trash2 className="h-4 w-4" />
-          Delete Habit
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>

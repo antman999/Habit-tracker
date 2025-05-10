@@ -67,7 +67,7 @@ export function HabitCalendar({
   };
 
   return (
-    <div className="w-full flex justify-center">
+    <div className="w-full overflow-hidden">
       <Calendar
         mode="multiple"
         selected={undefined}
@@ -79,17 +79,17 @@ export function HabitCalendar({
         modifiersClassNames={modifiersClassNames}
         showOutsideDays
         fixedWeeks
-        className="p-0 "
+        className="p-0 w-full"
         classNames={{
-          months: "w-full",
-          month: "w-full space-y-4",
+          months: "w-full flex justify-center",
+          month: "w-full space-y-2 sm:space-y-3",
           table: "w-full border-collapse",
-          head_row: "flex justify-around w-full",
+          head_row: "flex w-full justify-around",
           head_cell:
-            "text-muted-foreground rounded-md w-14 font-normal text-[0.8rem]",
-          row: "flex w-full mt-2 justify-around",
-          cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20", // Base cell styles from shadcn default
-          day: "h-10 w-14 p-0 font-normal aria-selected:opacity-100",
+            "text-muted-foreground rounded-md font-normal text-[0.7rem] sm:text-[0.8rem] w-8 h-8 sm:w-10 sm:h-10 md:w-12 flex items-center justify-center",
+          row: "flex w-full mt-1 sm:mt-2 justify-around",
+          cell: "p-0 flex-1",
+          day: "h-8 w-full sm:h-9 md:h-10 text-xs sm:text-sm p-0 font-normal aria-selected:opacity-100 flex items-center justify-center rounded-md hover:bg-accent focus-visible:ring-1 focus-visible:ring-ring",
           day_selected: "",
           day_range_start: "",
           day_range_end: "",
