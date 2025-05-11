@@ -85,6 +85,12 @@
   --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
   --sidebar-border: oklch(0.92 0.004 286.32);
   --sidebar-ring: oklch(0.606 0.25 292.717);
+  --chart-red: 0 72.2% 50.6%; /* HSL for red (e.g., from your chart-5) */
+  --chart-green: 142.1 70.6% 45.3%; /* HSL for green (e.g., from your chart-2) */
+  --brand-purple: 260 80% 60%; /* Example purple for gradient */
+  --brand-fuchsia: 300 80% 60%; /* Example fuchsia for gradient */
+  --card-background: oklch(1 0 0); /* Or your actual card background */
+  --card-foreground: oklch(0.141 0.005 285.823);
 }
 
 .dark {
@@ -119,6 +125,15 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.541 0.281 293.009);
+  --chart-red: 0 62.8% 40%; /* Darker red */
+  --chart-green: 144.9 65.1% 40.6%; /* Darker green */
+  --brand-purple: 260 70% 55%;
+  --brand-fuchsia: 300 70% 55%;
+
+  --card-background: oklch(
+    0.21 0.006 285.885
+  ); /* Or your actual dark card background */
+  --card-foreground: oklch(0.985 0 0); /* Or your actual dark card foreground */
 }
 
 @layer base {
