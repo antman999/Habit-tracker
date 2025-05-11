@@ -20,6 +20,31 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Habit Achiever",
   description: "Create habits and achieve them",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any", rel: "icon" },
+      {
+        url: "/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+        rel: "icon",
+      },
+      {
+        url: "/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+        rel: "icon",
+      },
+    ],
+    apple: [
+      {
+        url: "/apple-touch-icon.png",
+        sizes: "180x180",
+        rel: "apple-touch-icon",
+      },
+    ],
+  },
+  manifest: "/site.webmanifest",
 };
 
 export default function RootLayout({

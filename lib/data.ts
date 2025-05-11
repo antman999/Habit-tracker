@@ -3,27 +3,52 @@ import { Habit, Completion } from "@/lib/schema";
 import { eq, and, asc } from "drizzle-orm";
 import { auth } from "@clerk/nextjs/server";
 import "server-only";
-import { format, parseISO, differenceInDays, subDays } from "date-fns";
+import { parseISO, differenceInDays, subDays } from "date-fns";
 
 function formatToYYYYMMDD(date: Date): string {
-  return format(date, "yyyy-MM-dd");
+  const year = date.getUTCFullYear();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
+  const day = date.getUTCDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function calculateCurrentStreak(completionDateStrings: string[]): number {
-  if (!completionDateStrings.length) return 0;
+  if (!completionDateStrings || completionDateStrings.length === 0) {
+    return 0;
+  }
 
   const completionSet = new Set(completionDateStrings);
+
   let currentStreak = 0;
-  let checkDate = new Date();
-  while (completionSet.has(formatToYYYYMMDD(checkDate))) {
+  const serverNow = new Date();
+
+  const serverTodayFormattedUTC = formatToYYYYMMDD(serverNow);
+  const serverYesterdayFormattedUTC = formatToYYYYMMDD(subDays(serverNow, 1));
+
+  let dateToStartCountingFrom: Date;
+
+  if (completionSet.has(serverTodayFormattedUTC)) {
+    dateToStartCountingFrom = serverNow;
+  } else if (completionSet.has(serverYesterdayFormattedUTC)) {
+    dateToStartCountingFrom = subDays(serverNow, 1);
+  } else {
+    return 0;
+  }
+
+  let checkDate = dateToStartCountingFrom;
+  let formattedCheckDate = formatToYYYYMMDD(checkDate);
+
+  while (completionSet.has(formattedCheckDate)) {
     currentStreak++;
     checkDate = subDays(checkDate, 1);
+    formattedCheckDate = formatToYYYYMMDD(checkDate);
   }
   return currentStreak;
 }
 
 function calculateLongestStreak(completionDateStrings: string[]): number {
-  if (!completionDateStrings.length) return 0;
+  if (!completionDateStrings || completionDateStrings.length === 0) return 0;
+
   const dates = completionDateStrings
     .map((iso) => parseISO(iso))
     .sort((a, b) => a.getTime() - b.getTime());
@@ -31,9 +56,12 @@ function calculateLongestStreak(completionDateStrings: string[]): number {
   if (dates.length === 0) return 0;
 
   let longestStreak = 0;
-  let currentStreak = 1;
+  let currentStreak = 0;
 
-  longestStreak = 1;
+  if (dates.length > 0) {
+    longestStreak = 1;
+    currentStreak = 1;
+  }
 
   for (let i = 1; i < dates.length; i++) {
     if (differenceInDays(dates[i], dates[i - 1]) === 1) {
@@ -81,7 +109,10 @@ export async function fetchHabitDetails(
       .where(eq(Completion.habitId, id))
       .orderBy(asc(Completion.date));
 
-    const completionDateStrings = completions.map((c) => c.date);
+    const completionDateStrings = completions
+      .map((c) => c.date)
+      .filter((d) => d !== null) as string[];
+
     const currentStreak = calculateCurrentStreak(completionDateStrings);
     const longestStreak = calculateLongestStreak(completionDateStrings);
 
