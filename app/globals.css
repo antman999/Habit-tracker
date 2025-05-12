@@ -142,3 +142,23 @@
     @apply bg-background text-foreground;
   }
 }
+
+@keyframes heroSparkle {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.5);
+    opacity: 0;
+    transform: translateY(-20px) rotate(30deg);
+  }
+}
+
+.animate-heroSparkle {
+  animation: heroSparkle 1.2s ease-out forwards;
+}
