@@ -56,7 +56,10 @@ export default function RootLayout({
     <ClerkProvider afterSignOutUrl="/">
       <html lang="en" suppressHydrationWarning>
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-neutral-950`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased 
+                     bg-gradient-to-br from-gray-100 via-purple-100/40 to-fuchsia-100/30 
+                     dark:from-neutral-950 dark:via-purple-900/10 dark:to-fuchsia-900/5 
+                     text-foreground`}
         >
           <ThemeProvider
             attribute="class"
