@@ -7,6 +7,12 @@ import { Habit, NewHabit, Completion } from "@/lib/schema";
 import { eq, count, and } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+export interface ActionState {
+  success?: boolean;
+  error?: string;
+  message?: string;
+  fieldErrors?: Record<string, string[] | undefined>;
+}
 
 export type CreateHabitState = {
   errors?: {
@@ -18,10 +24,10 @@ export type CreateHabitState = {
   message?: string | null;
 };
 
-export type DeleteHabitState = {
-  success?: boolean;
-  error?: string;
-};
+const UpdateArchivedStatusSchema = z.object({
+  habitId: z.string().min(1, "Habit ID is required"),
+  is_archived: z.boolean(),
+});
 
 const DeleteHabitSchema = z.object({
   habitId: z.string().uuid({ message: "Invalid Habit ID format." }),
@@ -33,12 +39,17 @@ const HabitFormSchema = z.object({
   name: z
     .string()
     .min(2, { message: "Name must be at least 2 characters." })
-    .max(50)
+    .max(50, { message: "Name must not exceed 50 characters." })
     .trim(),
-  description: z.string().min(2).max(150).trim().optional(),
-  goal: z.enum(goalValues).optional(),
+  description: z
+    .string()
+    .min(2, { message: "Description must be at least 2 characters." })
+    .max(150, { message: "Description must not exceed 150 characters." })
+    .trim()
+    .optional()
+    .or(z.literal("")),
+  goal: z.enum(goalValues).optional().or(z.literal("")),
 });
-
 const MAX_HABITS_PER_USER = 6;
 
 export async function createHabitAction(
@@ -47,18 +58,18 @@ export async function createHabitAction(
 ): Promise<CreateHabitState> {
   const { userId } = await auth();
   if (!userId) {
-    return { message: "Unauthorized: Please sign in." };
+    return { errors: { _form: ["Unauthorized: Please sign in."] } };
   }
 
   const validatedFields = HabitFormSchema.safeParse({
     name: formData.get("name"),
-    description: formData.get("description"),
-    goal: formData.get("goal"),
+    description: formData.get("description") || undefined,
+    goal: formData.get("goal") || undefined,
   });
 
   if (!validatedFields.success) {
     console.log(
-      "Validation Errors:",
+      "Validation Errors (create habit):",
       validatedFields.error.flatten().fieldErrors
     );
     return {
@@ -86,20 +97,21 @@ export async function createHabitAction(
     const newHabitData: NewHabit = {
       userId: userId,
       name: name,
-      description: description,
-      goal: goal,
+      description: description || null,
+      goal: goal || null,
+      is_archived: false,
     };
 
     await db.insert(Habit).values(newHabitData);
   } catch (error) {
-    console.error("Database Error:", error);
+    console.error("Database Error (create habit):", error);
     return {
+      errors: { _form: ["Database Error: Failed to create habit."] },
       message: "Database Error: Failed to create habit.",
     };
   }
 
   revalidatePath("/habits");
-
   return { message: `Habit "${name}" created successfully!` };
 }
 
@@ -107,12 +119,13 @@ export async function toggleCompletionAction(
   habitId: string,
   date: string,
   completed: boolean
-): Promise<{ success?: boolean; error?: string }> {
-  "use server";
-
+): Promise<ActionState> {
   const { userId } = await auth();
   if (!userId) {
-    return { error: "Unauthorized" };
+    return { error: "Unauthorized: Please sign in." };
+  }
+  if (!habitId || !date) {
+    return { error: "Invalid input: Habit ID and date are required." };
   }
 
   try {
@@ -120,9 +133,8 @@ export async function toggleCompletionAction(
       where: and(eq(Habit.id, habitId), eq(Habit.userId, userId)),
       columns: { id: true },
     });
-
     if (!habit) {
-      return { error: "Habit not found or permission denied." };
+      return { error: "Habit not found or you do not have permission." };
     }
     if (completed) {
       await db
@@ -137,17 +149,87 @@ export async function toggleCompletionAction(
 
     revalidatePath("/habits");
     revalidatePath(`/habits/${habitId}`);
-    return { success: true };
+    return {
+      success: true,
+      message: `Completion for ${date} ${completed ? "marked" : "unmarked"}.`,
+    };
   } catch (error) {
-    console.error("Error toggling completion:", error);
-    return { error: "Database error occurred." };
+    console.error("Database Error (toggle completion):", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unknown database error occurred.";
+    return { error: `Database error: ${errorMessage}` };
+  }
+}
+
+export async function updateHabitArchivedStatus(
+  formData: FormData
+): Promise<ActionState> {
+  const { userId } = await auth();
+  if (!userId) {
+    return { error: "Unauthorized: Please sign in to update habit status." };
+  }
+  const validatedFields = UpdateArchivedStatusSchema.safeParse({
+    habitId: formData.get("habitId"),
+    is_archived: formData.get("is_archived") === "true",
+  });
+  if (!validatedFields.success) {
+    console.error(
+      "Validation Error (update archived):",
+      validatedFields.error.flatten().fieldErrors
+    );
+    return {
+      error: "Invalid input data. Please check the provided information.",
+      fieldErrors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  const { habitId, is_archived } = validatedFields.data;
+
+  try {
+    const habitToUpdate = await db
+      .select({ id: Habit.id, userId: Habit.userId })
+      .from(Habit)
+      .where(eq(Habit.id, habitId))
+      .limit(1);
+
+    if (
+      !habitToUpdate ||
+      habitToUpdate.length === 0 ||
+      habitToUpdate[0].userId !== userId
+    ) {
+      return {
+        error: "Habit not found or you do not have permission to modify it.",
+      };
+    }
+    await db
+      .update(Habit)
+      .set({ is_archived: is_archived })
+      .where(eq(Habit.id, habitId));
+
+    revalidatePath("/habits");
+    revalidatePath(`/habits/${habitId}`);
+
+    const actionMessage = `Habit successfully ${
+      is_archived ? "archived" : "unarchived"
+    }.`;
+    console.log(actionMessage, `Habit ID: ${habitId}`);
+    return { success: true, message: actionMessage };
+  } catch (error) {
+    console.error("Database Error (update archived):", error);
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unknown database error occurred.";
+    return { error: `Database error: ${errorMessage}` };
   }
 }
 
 export async function deleteHabitAction(
-  prevState: DeleteHabitState,
+  prevState: ActionState,
   formData: FormData
-): Promise<DeleteHabitState> {
+): Promise<ActionState> {
   const { userId } = await auth();
   if (!userId) {
     return { error: "Unauthorized: Please sign in." };
@@ -158,10 +240,16 @@ export async function deleteHabitAction(
   });
 
   if (!validatedFields.success) {
+    console.error(
+      "Validation Error (delete):",
+      validatedFields.error.flatten().fieldErrors
+    );
     return {
       error:
         "Invalid input: " +
-        validatedFields.error.flatten().fieldErrors.habitId?.join(", "),
+        (validatedFields.error.flatten().fieldErrors.habitId?.join(", ") ||
+          "Habit ID is missing or invalid."),
+      fieldErrors: validatedFields.error.flatten().fieldErrors,
     };
   }
 
@@ -181,11 +269,25 @@ export async function deleteHabitAction(
     await db
       .delete(Habit)
       .where(and(eq(Habit.id, habitId), eq(Habit.userId, userId)));
-  } catch (dbError) {
-    console.error("Database Error deleting habit:", dbError);
-    return { error: "Database error: Failed to delete habit." };
+    console.log(`Habit ${habitId} deleted successfully by user ${userId}.`);
+    revalidatePath("/habits");
+    redirect("/habits");
+  } catch (error) {
+    console.error("Error during habit deletion:", error);
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "message" in error &&
+      typeof error.message === "string" &&
+      (error.message === "NEXT_REDIRECT" ||
+        ("digest" in error && error.digest === "NEXT_REDIRECT"))
+    ) {
+      throw error;
+    }
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : "An unknown database error occurred.";
+    return { error: `Database error: ${errorMessage}` };
   }
-  revalidatePath("/habits");
-  revalidatePath(`/habits/${habitId}`);
-  redirect("/habits");
 }

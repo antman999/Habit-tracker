@@ -22,6 +22,7 @@ interface HabitWithCompletions {
   goal: string | null;
   createdAt: Date | string;
   completions: string[];
+  is_archived: boolean;
 }
 
 interface HabitGridProps {

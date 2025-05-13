@@ -57,8 +57,8 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body
           className={`${geistSans.variable} ${geistMono.variable} antialiased 
-                     bg-gradient-to-br from-gray-100 via-purple-100/40 to-fuchsia-100/30 
-                     dark:from-neutral-950 dark:via-purple-900/10 dark:to-fuchsia-900/5 
+                     bg-gradient-to-br from-gray-50 via-purple-100/40 to-fuchsia-200/30 
+                     dark:from-neutral-950 dark:via-purple-900/20 dark:to-fuchsia-900/20 
                      text-foreground`}
         >
           <ThemeProvider
