@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { Layout } from "@/components/layout/layout";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,9 +18,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Habit Achiever",
-  description: "Create habits and achieve them",
+  description:
+    "Your personal companion to track habits, build lasting consistency, and achieve your personal growth goals. Start your journey today!",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any", rel: "icon" },
@@ -45,6 +50,34 @@ export const metadata: Metadata = {
     ],
   },
   manifest: "/site.webmanifest",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    title: "Habit Achiever - Track & Build Positive Habits",
+    description:
+      "Your personal companion to track habits, build lasting consistency, and achieve your personal growth goals.",
+    images: [
+      {
+        url: `${siteUrl}/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "Habit Achiever App",
+      },
+    ],
+    siteName: "Habit Achiever",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({
@@ -71,6 +104,7 @@ export default function RootLayout({
             <Toaster />
           </ThemeProvider>
           <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
