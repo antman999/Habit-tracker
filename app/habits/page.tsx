@@ -9,6 +9,7 @@ import {
 import { eq, inArray, asc } from "drizzle-orm";
 import { HabitGridSkeleton } from "@/components/habit-grid/HabitGridSkeleton";
 import { HabitGrid } from "@/components/habit-grid/HabitGrid";
+import { ArchivedHabitList } from "@/components/habit-grid/ArchivedHabitList";
 
 interface HabitWithCompletions {
   id: string;
@@ -18,6 +19,7 @@ interface HabitWithCompletions {
   goal: string | null;
   createdAt: Date;
   completions: string[];
+  is_archived: boolean;
 }
 
 type DrizzleHabit = typeof HabitTable.$inferSelect;
@@ -76,14 +78,20 @@ async function fetchHabitsDataForUser(): Promise<HabitWithCompletions[]> {
 }
 
 export default async function HabitsPage() {
-  const habitsData = await fetchHabitsDataForUser();
+  const allHabitsData: HabitWithCompletions[] = await fetchHabitsDataForUser();
+
+  const activeHabits = allHabitsData.filter((habit) => !habit.is_archived);
+  const archivedHabits = allHabitsData.filter((habit) => habit.is_archived);
 
   return (
     <>
       <NewHabitForm />
       <Suspense fallback={<HabitGridSkeleton />}>
-        <HabitGrid initialHabits={habitsData} />
+        <HabitGrid initialHabits={activeHabits} />
       </Suspense>
+      {archivedHabits.length > 0 && (
+        <ArchivedHabitList habits={archivedHabits} />
+      )}
     </>
   );
 }

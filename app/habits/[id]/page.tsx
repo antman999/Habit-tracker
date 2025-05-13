@@ -4,8 +4,8 @@ import { HabitCalendar } from "@/components/habit-calendar/HabitCalendar";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { DeleteHabitButton } from "@/components/DeleteHabitButton";
 import { HabitProgressChart } from "@/components/habit-progress-chart/HabitProgressChart";
+import { HabitActionsDropdown } from "@/components/HabitActionsDropdown";
 
 interface AsyncPageProps {
   params: Promise<{ id: string }>;
@@ -70,7 +70,11 @@ export default async function Page({ params }: AsyncPageProps) {
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-fuchsia-500 bg-clip-text text-transparent pr-4">
             {name}
           </h1>
-          <DeleteHabitButton habitId={habitDetails.id} habitName={name} />
+          <HabitActionsDropdown
+            habitId={habitDetails.id}
+            isArchived={habitDetails.is_archived}
+            habitName={name}
+          />
         </div>
         <div
           className={`grid grid-cols-1 ${

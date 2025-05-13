@@ -44,7 +44,7 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 pt-16 sm:pt-20 md:pt-24 pb-4">
       <section className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center mb-8 sm:mb-24 md:mb-32">
-        <header className="text-center md:text-left order-1 md:order-1 mb-4 md:mb-0 mx-auto">
+        <header className="text-center md:text-left order-1 md:order-1 mb-4 md:mb-0 mx-auto md:pr-4 lg:pr-6">
           <h1 className="text-4xl lg:text-5xl font-bold mb-3 text-gray-400/80 dark:text-gray-200/70 italic">
             Habit Achiever
           </h1>
@@ -65,7 +65,7 @@ export default function Home() {
             </Button>
           </SignInButton>
         </header>
-        <div className="order-2 md:order-2 flex justify-center">
+        <div className="order-2 md:order-2 flex justify-center md:justify-end md:pl-4 lg:pl-6">
           <HeroVisual />
         </div>
       </section>

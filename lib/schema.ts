@@ -8,6 +8,7 @@ import {
   uniqueIndex,
   index,
   foreignKey,
+  boolean,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -24,6 +25,7 @@ export const Habit = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
       .notNull(),
+    is_archived: boolean("is_archived").default(false).notNull(),
   },
   (table) => [index("habits_user_id_idx").on(table.userId)]
 );
