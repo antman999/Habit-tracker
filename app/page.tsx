@@ -8,7 +8,30 @@ import {
 } from "@/static-data/homepage";
 import { SignInButton } from "@clerk/nextjs";
 import { Github, MoveRight } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title:
+    "Habit Achiever - Set up your habits, track your progress, and build lasting consistency.",
+  description:
+    "Join Habit Achiever to easily track your habits, visualize progress, and build lasting consistency.",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title:
+      "Habit Achiever - Set up your habits, track your progress, and build lasting consistency.",
+    description:
+      "Join Habit Achiever to easily track your habits, visualize progress, and build lasting consistency.",
+  },
+  twitter: {
+    title:
+      "Habit Achiever - Set up your habits, track your progress, and build lasting consistency.",
+    description:
+      "Join Habit Achiever to easily track your habits, visualize progress, and build lasting consistency.",
+  },
+};
 
 function FeatureCard({
   icon: Icon,
@@ -44,11 +67,11 @@ export default function Home() {
   return (
     <div className="container mx-auto px-4 pt-16 sm:pt-20 md:pt-24 pb-4">
       <section className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 lg:gap-16 items-center mb-8 sm:mb-24 md:mb-32">
-        <header className="text-center md:text-left order-1 md:order-1 mb-4 md:mb-0 mx-auto md:pr-4 lg:pr-6">
-          <h1 className="text-4xl lg:text-5xl font-bold mb-3 text-gray-400/80 dark:text-gray-200/70 italic">
+        <header className="text-center md:text-left order-1 md:order-1 mb-4 md:mb-0 mx-auto md:pr-4 lg:pr-6 md:ml-10 lg:ml-20 xl:ml-32">
+          <h1 className="text-4xl lg:text-5xl md:text-4xl font-bold mb-3 text-gray-400/80 dark:text-gray-200/70 italic">
             Habit Achiever
           </h1>
-          <p className="text-4xl sm:text-5xl md:text-4xl lg:text-6xl font-semibold mb-4 bg-gradient-to-r from-purple-600 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent leading-tight">
+          <p className="text-4xl sm:text-5xl md:text-5xl lg:text-6xl font-semibold mb-4 bg-gradient-to-r from-purple-600 via-pink-500 to-fuchsia-500 bg-clip-text text-transparent leading-tight">
             Achievers start here.
           </p>
           <p className="text-base sm:text-lg md:text-base lg:text-xl text-muted-foreground mb-8 max-w-lg">
