@@ -7,7 +7,8 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { useEffect } from "react";
 import { toast } from "sonner";
-import { createHabitAction, CreateHabitState } from "@/lib/actions";
+import { createHabitAction } from "@/lib/actions";
+import { CreateHabitState } from "@/lib/types";
 import {
   Form,
   FormControl,
@@ -64,7 +65,7 @@ export function NewHabitForm() {
     },
   });
 
-  const initialState: CreateHabitState = { message: null, errors: {} };
+  const initialState: CreateHabitState = { message: null, errors: undefined };
   const [state, formAction] = useActionState(createHabitAction, initialState);
 
   const isLimitError = state?.errors?._form?.includes(HABIT_LIMIT_ERROR_MSG);
@@ -72,6 +73,7 @@ export function NewHabitForm() {
   useEffect(() => {
     if (state?.message && !state.errors) {
       toast.success(state.message);
+      console.log("here");
       form.reset();
     } else if (state?.message && state.errors) {
       if (!isLimitError) {
@@ -86,6 +88,7 @@ export function NewHabitForm() {
         toast.error(
           state.message + (errorMessages ? ` (${errorMessages})` : "")
         );
+        console.log("here 2");
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

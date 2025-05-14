@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
-import { fetchHabitDetails, HabitWithDetailsAndCompletions } from "@/lib/data";
+import { fetchHabitDetails } from "@/lib/data";
+import { HabitWithDetailsAndCompletions } from "@/lib/types";
 import { HabitCalendar } from "@/components/habit-calendar/HabitCalendar";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
@@ -66,7 +67,7 @@ export default async function Page({ params }: AsyncPageProps) {
             Back
           </Link>
         </div>
-        <div className="flex justify-between items-start mb-6 sm:mb-8">
+        <div className="flex justify-between items-start mb-3 sm:mb-4">
           <h1 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-500 to-fuchsia-500 bg-clip-text text-transparent pr-4">
             {name}
           </h1>
@@ -86,14 +87,15 @@ export default async function Page({ params }: AsyncPageProps) {
               goalDays && goalDays > 0 ? "md:col-span-2" : "md:col-span-3"
             }`}
           >
-            {description && (
-              <div>
-                <h3 className="font-semibold text-foreground mb-1">
-                  Description
-                </h3>
+            <div>
+              <h3 className="font-semibold text-foreground mb-1">
+                Description
+              </h3>
+              {description && (
                 <p className="text-muted-foreground">{description}</p>
-              </div>
-            )}
+              )}
+            </div>
+
             <div className="space-y-2 pt-2">
               <h3 className="font-semibold text-foreground mb-2">Stats</h3>
               <div className="grid grid-cols-1 gap-x-4 gap-y-2">

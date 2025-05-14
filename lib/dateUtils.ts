@@ -30,10 +30,17 @@ function getDateSuffix(day: number): string {
   }
 }
 
-function formatIsoDate(date: Date): string {
+export function formatDisplayIsoDate(date: Date): string {
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, "0");
   const day = date.getDate().toString().padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function formatToUTCIsoDateString(date: Date): string {
+  const year = date.getUTCFullYear();
+  const month = (date.getUTCMonth() + 1).toString().padStart(2, "0");
+  const day = date.getUTCDate().toString().padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -49,9 +56,9 @@ export function getCurrentWeekDatesFormatted(): WeekDate[] {
   for (let i = 0; i < 7; i++) {
     const currentDayDate = new Date(startOfWeek);
     currentDayDate.setDate(startOfWeek.getDate() + i);
-
     const dayNumber = currentDayDate.getDate();
     const suffix = getDateSuffix(dayNumber);
+
     const dayNameShort = currentDayDate.toLocaleDateString("en-US", {
       weekday: "short",
     });
@@ -60,31 +67,47 @@ export function getCurrentWeekDatesFormatted(): WeekDate[] {
     });
 
     const formattedDisplay = `${dayNameShort}, ${monthName} ${dayNumber}${suffix}`;
-    const formattedIso = formatIsoDate(currentDayDate);
+    const formattedIso = formatDisplayIsoDate(currentDayDate);
     const dayInitial = currentDayDate.toLocaleDateString("en-US", {
       weekday: "narrow",
     });
-    const dayNumberStr = dayNumber.toString();
 
     weekDates.push({
       display: formattedDisplay,
       iso: formattedIso,
       dayInitial: dayInitial,
-      dayNumber: dayNumberStr,
+      dayNumber: dayNumber.toString(),
     });
   }
   return weekDates;
 }
 
-export function groupConsecutiveDates(isoDates: string[]): DateGroup {
-  if (!isoDates || isoDates.length === 0) {
-    return { single: [], start: [], middle: [], end: [] };
+export function processRange(range: Date[], groups: DateGroup) {
+  if (!range || range.length === 0) return;
+
+  if (range.length === 1) {
+    groups.single.push(range[0]);
+  } else {
+    groups.start.push(range[0]);
+    groups.end.push(range[range.length - 1]);
+    for (let j = 1; j < range.length - 1; j++) {
+      groups.middle.push(range[j]);
+    }
   }
+}
+
+export function groupConsecutiveDates(isoDates: string[]): DateGroup {
+  const groups: DateGroup = { single: [], start: [], middle: [], end: [] };
+  if (!isoDates || isoDates.length === 0) {
+    return groups;
+  }
+
   const dates = isoDates
     .map((iso) => parseISO(iso))
     .sort((a, b) => a.getTime() - b.getTime());
-  const groups: DateGroup = { single: [], start: [], middle: [], end: [] };
+
   if (dates.length === 0) return groups;
+
   let currentRange: Date[] = [dates[0]];
   for (let i = 1; i < dates.length; i++) {
     if (differenceInDays(dates[i], dates[i - 1]) === 1) {
@@ -95,17 +118,6 @@ export function groupConsecutiveDates(isoDates: string[]): DateGroup {
     }
   }
   processRange(currentRange, groups);
-  return groups;
-}
 
-export function processRange(range: Date[], groups: DateGroup) {
-  if (range.length === 1) {
-    groups.single.push(range[0]);
-  } else if (range.length > 1) {
-    groups.start.push(range[0]);
-    groups.end.push(range[range.length - 1]);
-    for (let j = 1; j < range.length - 1; j++) {
-      groups.middle.push(range[j]);
-    }
-  }
+  return groups;
 }
